@@ -1,0 +1,19 @@
+$primary-color: #333;
+$primary-color-light: lighten($primary-color, 10);
+$primary-color-dark: darken($primary-color, 10);
+
+$secondary-color: #666;
+$secondary-color-light: lighten($secondary-color, 10);
+$secondary-color-dark: darken($secondary-color, 10);
+
+$tertiary-color: #1A237E;
+$tertiary-color-light: lighten($tertiary-color, 10);
+$tertiary-color-dark: darken($tertiary-color, 10);
+
+$success-color: #5cb85c;
+$warning-color: #f0ad4e;
+$danger-color:  #d9534f;
+
+$light-gray-shade: #f9f9f9;
+$gray-shade: #999;
+$dark-gray-shade: #333333;

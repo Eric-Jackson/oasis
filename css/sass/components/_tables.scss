@@ -1,0 +1,133 @@
+table {
+	color: $dark-text-color;
+	font-size: 13px;
+}
+
+.tborder {
+	background: $lightest-background;
+	width: 100%;
+	margin: auto auto;
+	border: 1px solid #ccc;
+	padding: 1px;
+}
+
+.tfixed {
+	table-layout: fixed;
+	word-wrap: break-word;
+}
+
+.thead {
+	background: linear-gradient($primary-color-light, $primary-color);
+	color: #ffffff;
+	border-bottom: 1px solid #263c30;
+	padding: 8px;
+	& a:link, & a:visited {
+		color: #FFF;
+		opacity: .9;
+		@include transition(opacity);
+	}
+	& a:hover, & a:active {
+		opacity: 1;
+	}
+}
+
+.tcat {
+	background: #0f0f0f url($img-path + 'tcat.png') repeat-x;
+	color: #fff;
+	border-top: 1px solid #444;
+	border-bottom: 1px solid #000;
+	padding: 6px;
+	font-size: 12px;
+}
+
+.tcat a:link {
+	color: #fff;
+}
+
+.tcat a:visited {
+	color: #fff;
+}
+
+.tcat a:hover,
+.tcat a:active {
+	color: #fff;
+}
+
+.trow1 {
+	background: #f5f5f5;
+	border: 1px solid;
+	border-color: #fff #ddd #ddd #fff;
+}
+
+.trow2 {
+	background: #efefef;
+	border: 1px solid;
+	border-color: #fff #ddd #ddd #fff;
+}
+
+.trow_shaded {
+	background: #ffdde0;
+	border: 1px solid;
+	border-color: #fff #ffb8be #ffb8be #fff;
+}
+
+.no_bottom_border {
+	border-bottom: 0;
+}
+
+.trow_deleted,
+.post.deleted_post {
+	background: #E8DEFF;
+}
+
+.trow_selected,
+tr.trow_selected td {
+	background: #FFFBD9;
+	color: $dark-text-color;
+	border-right-color: #F7E86A;
+	border-bottom-color: #F7E86A;
+}
+
+.trow_selected a:link,
+.trow_selected a:visited,
+.trow_selected a:hover,
+.trow_selected a:active {
+	color: $dark-text-color;
+}
+
+.trow_sep {
+	background: #ddd;
+	color: $dark-text-color;
+	border-bottom: 1px solid #c5c5c5;
+	padding: 6px;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.tfoot {
+	border-top: 1px solid #fff;
+	padding: 6px;
+	background: #ddd;
+	color: #666;
+}
+
+.tfoot a:link {
+	color: #444;
+	text-decoration: none;
+}
+
+.tfoot a:visited {
+	color: #444;
+	text-decoration: none;
+}
+
+.tfoot a:hover,
+.tfoot a:active {
+	color: #444;
+	text-decoration: underline;
+}
+
+.thead input.textbox,
+.thead select {
+	border: 1px solid #263c30;
+}

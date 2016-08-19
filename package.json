@@ -1,19 +1,12 @@
 {
   "name": "clement",
   "version": "1.0.0",
-  "description": "MyBB Theme",
-  "main": "gulpfile.js",
+  "description": "Modern MyBB Theme",
   "dependencies": {
     "gulp": "^3.9.1",
-    "gulp-sass": "^2.3.2"
-  },
-  "devDependencies": {
-    "gulp": "github:gulpjs/gulp#4.0",
+    "gulp-sass": "^2.3.2",
     "gulp-clean-css": "^2.0.12",
     "gulp-rename": "^1.2.2"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Eric Jackson",
   "license": "ISC"
