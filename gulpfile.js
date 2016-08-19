@@ -4,7 +4,7 @@ var cleanCSS = require('gulp-clean-css');
 var rename = require('gulp-rename');
 
 gulp.task('sass', function () {
-  return gulp.src('css/sass/*.scss')
+  return gulp.src('css/sass/**/*.scss')
     .pipe(sass())
     .pipe(gulp.dest('css'))
     .pipe(cleanCSS({compatibility: 'ie8'}))
@@ -14,5 +14,5 @@ gulp.task('sass', function () {
 
 
 gulp.task('default', function () {
-  gulp.watch('css/sass/*.scss', ['sass']);
+  gulp.watch('css/sass/**/*.scss', ['sass']);
 });

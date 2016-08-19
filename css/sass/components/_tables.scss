@@ -3,6 +3,16 @@ table {
 	font-size: 13px;
 }
 
+tr {
+	display: flex;
+	flex-direction: row;
+}
+
+td {
+	flex-grow: 1;
+	width: auto;
+}
+
 .tborder {
 	background: $lightest-background;
 	width: 100%;
@@ -21,12 +31,12 @@ table {
 	color: #ffffff;
 	border-bottom: 1px solid #263c30;
 	padding: 8px;
-	& a:link, & a:visited {
+	a:link, a:visited {
 		color: #FFF;
 		opacity: .9;
 		@include transition(opacity);
 	}
-	& a:hover, & a:active {
+	a:hover, a:active {
 		opacity: 1;
 	}
 }
@@ -53,14 +63,8 @@ table {
 	color: #fff;
 }
 
-.trow1 {
+.trow1, .trow2 {
 	background: #f5f5f5;
-	border: 1px solid;
-	border-color: #fff #ddd #ddd #fff;
-}
-
-.trow2 {
-	background: #efefef;
 	border: 1px solid;
 	border-color: #fff #ddd #ddd #fff;
 }
