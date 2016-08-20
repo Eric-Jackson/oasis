@@ -48,9 +48,9 @@ table {
   clear: both; }
 
 body {
-  background: #FFFFFF;
+  background: #f9f9f9;
   color: #333333;
-  line-height: 1.5em;
+  line-height: 1.4em;
   margin: 0;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 16px;
@@ -68,18 +68,15 @@ a:hover, a:active {
   color: #005389; }
 
 .wrapper {
-  width: 85%;
-  min-width: 970px;
+  width: 95%;
   max-width: 1500px;
   margin: 0 auto; }
 
 #logo {
-  background: #FFFFFF;
   padding: 10px 0;
   border-bottom: 1px solid #263c30; }
 
 #content {
-  background: #FFFFFF;
   width: auto;
   padding: 20px 10px;
   overflow: hidden; }
@@ -1141,22 +1138,32 @@ a.button {
 
 table {
   color: #333333;
-  font-size: 13px; }
+  font-size: 13px;
+  display: flex;
+  flex-direction: column; }
 
 tr {
   display: flex;
-  flex-direction: row; }
+  flex-direction: row;
+  flex-wrap: wrap; }
 
 td {
-  flex-grow: 1;
-  width: auto; }
+  flex: 1;
+  width: auto;
+  padding: 15px;
+  max-width: 100%; }
+
+td[colspan='2'] {
+  flex: 2; }
+
+td[colspan='3'] {
+  flex: 3; }
 
 .tborder {
   background: #FFFFFF;
   width: 100%;
   margin: auto auto;
-  border: 1px solid #ccc;
-  padding: 1px; }
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); }
 
 .tfixed {
   table-layout: fixed;
@@ -1194,9 +1201,8 @@ td {
   color: #fff; }
 
 .trow1, .trow2 {
-  background: #f5f5f5;
-  border: 1px solid;
-  border-color: #fff #ddd #ddd #fff; }
+  background: #FFFFFF;
+  border-bottom: 1px solid #ddd; }
 
 .trow_shaded {
   background: #ffdde0;

@@ -11,9 +11,9 @@
 }
 
 body {
-	background: $lightest-background;
+	background: $light-gray-shade;
 	color: $dark-text-color;
-	line-height: 1.5em;
+	line-height: 1.4em;
 	margin: 0;
 	font-family: $font-family-sans-serif;
 	font-size: $font-size;
@@ -37,20 +37,17 @@ a:hover, a:active {
 // }
 
 .wrapper {
-	width: 85%;
-	min-width: 970px;
+	width: 95%;
 	max-width: 1500px;
 	margin: 0 auto;
 }
 
 #logo {
-	background: $lightest-background;
 	padding: 10px 0;
 	border-bottom: 1px solid #263c30;
 }
 
 #content {
-	background: $lightest-background;
 	width: auto;
 	padding: 20px 10px;
 	overflow: hidden;
