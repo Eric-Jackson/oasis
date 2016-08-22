@@ -1,6 +1,0 @@
-@mixin transition($property, $speed: $transition-speed, $type: $transition-type) {
-  @if ($transition-active == true) {
-    -webkit-transition: $property $speed $type;
-    transition: $property $speed $type;
-  }
-}

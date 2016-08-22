@@ -47,6 +47,9 @@ table {
 .clear {
   clear: both; }
 
+html {
+  font-size: 62.5%; }
+
 body {
   background: #f9f9f9;
   color: #333333;
@@ -174,7 +177,9 @@ a:hover, a:active {
   border-color: #000; }
 
 #search input.button {
-  background: #0066a2 url("../images/thead.png") top left repeat-x;
+  background: -webkit-linear-gradient(#0091ef, #0072BC);
+  background: -o-linear-gradient(#0091ef, #0072BC);
+  background: linear-gradient(#0091ef, #0072BC);
   color: #fff; }
 
 #search input {
@@ -1141,23 +1146,19 @@ table {
   font-size: 13px;
   display: flex;
   flex-direction: column; }
-
-tr {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap; }
-
-td {
-  flex: 1;
-  width: auto;
-  padding: 15px;
-  max-width: 100%; }
-
-td[colspan='2'] {
-  flex: 2; }
-
-td[colspan='3'] {
-  flex: 3; }
+  table tr {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap; }
+    table tr td {
+      flex: 1;
+      width: auto;
+      padding: 15px;
+      max-width: 100%; }
+      table tr td[colspan='2'] {
+        flex: 2; }
+      table tr td[colspan='3'] {
+        flex: 3; }
 
 .tborder {
   background: #FFFFFF;
@@ -1170,6 +1171,8 @@ td[colspan='3'] {
   word-wrap: break-word; }
 
 .thead {
+  background: -webkit-linear-gradient(#0091ef, #0072BC);
+  background: -o-linear-gradient(#0091ef, #0072BC);
   background: linear-gradient(#0091ef, #0072BC);
   color: #ffffff;
   border-bottom: 1px solid #263c30;

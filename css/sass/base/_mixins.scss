@@ -1,0 +1,17 @@
+@mixin transition($property, $speed: $transition-speed, $type: $transition-type) {
+  @if ($transition-active == true) {
+    -webkit-transition: $property $speed $type;
+    transition: $property $speed $type;
+  }
+}
+
+@mixin primary-gradient($start-color: $primary-color-light, $end-color: $primary-color) {
+  @if ($gradient-active == true) {
+    background: -webkit-linear-gradient($start-color, $end-color);
+    background: -o-linear-gradient($start-color, $end-color);
+    background: linear-gradient($start-color, $end-color);
+  }
+  @else {
+    background: $end-color;
+  }
+}

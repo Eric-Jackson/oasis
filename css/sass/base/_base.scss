@@ -10,6 +10,10 @@
 	clear: both;
 }
 
+html {
+	font-size: 62.5%;
+}
+
 body {
 	background: $light-gray-shade;
 	color: $dark-text-color;
@@ -165,7 +169,7 @@ a:hover, a:active {
 }
 
 #search input.button {
-	background: #0066a2 url($img-path + 'thead.png') top left repeat-x;
+	@include primary-gradient;
 	color: #fff;
 }
 

@@ -3,28 +3,21 @@ table {
 	font-size: 13px;
 	display: flex;
 	flex-direction: column;
-}
-
-tr {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-}
-
-td {
-	flex: 1;
-	width: auto;
-	padding: 15px;
-	max-width: 100%;
-}
-
-td[colspan='2'] {
-	flex: 2;
-}
-
-td[colspan='3'] {
-	flex: 3;
-}
+	tr {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		td {
+			flex: 1;
+			width: auto;
+			padding: 15px;
+			max-width: 100%;
+			&[colspan='2'] {
+				flex: 2;
+			}
+			&[colspan='3'] {
+				flex: 3;
+			} } } }
 
 .tborder {
 	background: $lightest-background;
@@ -39,7 +32,7 @@ td[colspan='3'] {
 }
 
 .thead {
-	background: linear-gradient($primary-color-light, $primary-color);
+	@include primary-gradient;
 	color: #ffffff;
 	border-bottom: 1px solid #263c30;
 	padding: 8px;
