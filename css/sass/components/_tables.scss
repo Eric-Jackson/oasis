@@ -4,19 +4,21 @@ table {
 	display: flex;
 	flex-direction: column;
 	tr {
+		text-align: left;
 		display: flex;
 		flex-direction: row;
 		flex-wrap: wrap;
 		td {
 			flex: 1;
-			width: auto;
 			padding: 15px;
-			max-width: 100%;
 			&[colspan='2'] {
-				flex: 2;
+				flex-grow: 2;
 			}
 			&[colspan='3'] {
-				flex: 3;
+				flex-grow: 3;
+			}
+			&[colspan='4'] {
+				flex-grow: 4;
 			} } } }
 
 .tborder {
