@@ -1,0 +1,13 @@
+/*!
+	Theme Name: Clement
+	Theme URI: http://digitalrelativity.com
+	Description: Modern MyBB, responsive and powered with SCSS
+	Version: 1.0
+	Author: Eric Jackson
+*/
+
+@import 'base/module';
+@import 'components/module';
+@import 'pages/module';
+@import 'themes/module';
+@import 'vendors/module';

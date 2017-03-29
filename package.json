@@ -9,5 +9,12 @@
     "gulp-rename": "^1.2.2"
   },
   "author": "Eric Jackson",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.24.0",
+    "babel-preset-env": "^1.2.2",
+    "gulp-babel": "^6.1.2",
+    "gulp-imagemin": "^3.2.0",
+    "gulp-minify": "0.0.15"
+  }
 }
