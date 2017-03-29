@@ -9,7 +9,7 @@ var imagemin = require('gulp-imagemin');
 gulp.task("js", function () {
   return gulp.src("src/js/main.js")
     .pipe(babel())
-    .pipe(gulp.dest("dist/js"))
+    .pipe(gulp.dest("dist/themes/clement/js"))
     .pipe(minify({
       ext:{
         src:'.js',
@@ -17,22 +17,22 @@ gulp.task("js", function () {
       }
     }))
     // .pipe(rename({suffix: '.min'}))
-    .pipe(gulp.dest('dist/js'));
+    .pipe(gulp.dest('dist/themes/clement/js'));
 });
 
 gulp.task('sass', function () {
   return gulp.src('src/css/sass/**/*.scss')
     .pipe(sass())
-    .pipe(gulp.dest('dist/css'))
+    .pipe(gulp.dest('dist/themes/clement/css'))
     .pipe(cleanCSS({compatibility: 'ie8'}))
     .pipe(rename({suffix: '.min'}))
-    .pipe(gulp.dest('dist/css'));
+    .pipe(gulp.dest('dist/themes/clement/css'));
 });
 
 gulp.task('img', function() {
   gulp.src('src/images/**/*')
     .pipe(imagemin())
-    .pipe(gulp.dest('dist/images'))
+    .pipe(gulp.dest('dist/themes/clement/images'))
 });
 
 gulp.task('watch', function () {

@@ -1,6 +1,12 @@
-!(function() {
+class Clement {
+  constructor(sayit) {
+    this.sayit = sayit;
+  }
 
-}());
+  sayIt() {
+    return console.log(this.sayit);
+  }
+}
 
-
-console.log('Javascript');
+let clement = new Clement('Hi');
+clement.sayIt();
