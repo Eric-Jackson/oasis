@@ -16,7 +16,6 @@ gulp.task("js", function () {
         min:'.min.js'
       }
     }))
-    // .pipe(rename({suffix: '.min'}))
     .pipe(gulp.dest('dist/themes/clement/js'));
 });
 

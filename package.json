@@ -2,19 +2,28 @@
   "name": "clement",
   "version": "1.0.0",
   "description": "Modern MyBB Theme",
-  "dependencies": {
-    "gulp": "^3.9.1",
-    "gulp-sass": "^2.3.2",
-    "gulp-clean-css": "^2.0.12",
-    "gulp-rename": "^1.2.2"
-  },
   "author": "Eric Jackson",
   "license": "ISC",
   "devDependencies": {
     "babel-cli": "^6.24.0",
     "babel-preset-env": "^1.2.2",
+    "commander": "^2.9.0",
+    "del": "^2.2.2",
+    "glob": "^7.1.1",
+    "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
+    "gulp-clean-css": "^2.0.12",
     "gulp-imagemin": "^3.2.0",
-    "gulp-minify": "0.0.15"
+    "gulp-minify": "0.0.15",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^2.3.2",
+    "mkdirp": "^0.5.1",
+    "mysql": "^2.13.0",
+    "sequence": "^3.0.0",
+    "watch": "^1.0.2",
+    "write": "^0.3.3"
+  },
+  "scripts": {
+    "templates:download": "node ./tasks/templates/app.js init"
   }
 }

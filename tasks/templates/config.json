@@ -1,0 +1,35 @@
+{
+	"database": {
+		"prefix": "mybb_"
+	},
+	"mysql": {
+		"host": "localhost",
+		"user": "root",
+		"password": "root",
+		"database": "clement",
+    "port": 8889
+	},
+	"app": {
+		"datadir": "./src/templates",
+		"fileext": ".html"
+	},
+	"templates": {
+		"id": 2,
+		"ungrouped": [
+			"attachment_icon",
+			"changeuserbox",
+			"codebuttons",
+			"contact",
+			"debug_summary",
+			"gobutton",
+			"headerinclude",
+			"htmldoctype",
+			"loginbox",
+			"php_warnings",
+			"previewpost",
+			"redirect",
+			"smilie",
+			"task_image"
+		]
+	}
+}
