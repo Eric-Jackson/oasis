@@ -24,6 +24,11 @@
     "write": "^0.3.3"
   },
   "scripts": {
-    "templates:download": "node ./tasks/templates/app.js init"
+    "templates:download": "node ./tasks/templates/app.js init",
+    "templates:upload": "node ./tasks/templates/app.js upload",
+    "templates:watch": "node ./tasks/templates/app.js watch",
+    "templates:reset": "node ./tasks/templates/app.js reset",
+    "templates:delete": "node ./tasks/templates/app.js delete"
+
   }
 }

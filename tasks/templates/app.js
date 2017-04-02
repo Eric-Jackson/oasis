@@ -12,14 +12,14 @@ program
   });
 
 program
-  .command('write-file')
+  .command('reset')
   .description('overwrite all files by templates from database')
   .action(function(env, options){
     app.toFile();
   });
 
 program
-  .command('write-db')
+  .command('upload')
   .description('overwrite all database templates by templates from files')
   .action(function(env, options){
     app.toDb();
@@ -33,7 +33,7 @@ program
   });
 
 program
-  .command('clear')
+  .command('delete')
   .description('delete all file templates')
   .action(function(env, options){
     app.clear();
