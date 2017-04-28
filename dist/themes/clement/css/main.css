@@ -75,31 +75,6 @@ a:hover, a:active {
   max-width: 1500px;
   margin: 0 auto; }
 
-#logo {
-  padding: 10px 0;
-  border-bottom: 1px solid #263c30; }
-
-#content {
-  width: auto;
-  padding: 20px 10px;
-  overflow: hidden; }
-
-#header ul.menu {
-  margin: 0;
-  padding: 0;
-  list-style: none; }
-
-#header ul.menu li {
-  margin: 0 7px;
-  display: inline; }
-
-#header ul.menu li a {
-  display: inline-block;
-  line-height: 16px; }
-
-#logo ul.top_links {
-  font-weight: bold; }
-
 #panel .upper a.logout {
   font-weight: bold;
   background: url("../images/headerlinks_sprite.png") right -80px no-repeat;
@@ -1263,6 +1238,46 @@ tr.trow_selected td {
 .thead input.textbox,
 .thead select {
   border: 1px solid #263c30; }
+
+.header {
+  background: #0072BC; }
+  .header .menu {
+    float: right; }
+    .header .menu__item a {
+      color: #FFF;
+      font-weight: bold; }
+
+.logo {
+  display: inline-block; }
+  .logo__image {
+    width: 100%;
+    max-width: 200px;
+    height: auto; }
+
+#logo {
+  padding: 10px 0;
+  border-bottom: 1px solid #263c30; }
+
+#content {
+  width: auto;
+  padding: 20px 10px;
+  overflow: hidden; }
+
+#header ul.menu {
+  margin: 0;
+  padding: 0;
+  list-style: none; }
+
+#header ul.menu li {
+  margin: 0 7px;
+  display: inline; }
+
+#header ul.menu li a {
+  display: inline-block;
+  line-height: 16px; }
+
+#logo ul.top_links {
+  font-weight: bold; }
 
 .usercp_nav_item {
   display: block;

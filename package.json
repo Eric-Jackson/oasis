@@ -21,7 +21,8 @@
     "mysql": "^2.13.0",
     "sequence": "^3.0.0",
     "watch": "^1.0.2",
-    "write": "^0.3.3"
+    "write": "^0.3.3",
+    "xml2js": "^0.4.17"
   },
   "scripts": {
     "templates:download": "node ./tasks/templates/app.js init",
@@ -29,6 +30,5 @@
     "templates:watch": "node ./tasks/templates/app.js watch",
     "templates:reset": "node ./tasks/templates/app.js reset",
     "templates:delete": "node ./tasks/templates/app.js delete"
-
   }
 }

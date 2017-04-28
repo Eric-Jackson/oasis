@@ -10,6 +10,7 @@ var glob = require("glob");
 var mkdirp = require("mkdirp");
 var path = require('path');
 var fs = require('fs');
+var xml2js = require('xml2js');
 var Sequence = require('sequence').Sequence,
                sequence = Sequence.create();
 
@@ -72,6 +73,15 @@ module.exports = {
       })
     });
   },
+  loadThemeFile: function() {
+    var parser = new xml2js.Parser();
+    fs.readFile(__dirname + '/foo.xml', function(err, data) {
+      parser.parseString(data, function (err, result) {
+        console.dir(result);
+        console.log('Done');
+      });
+    });
+  },
   clear: function(){
     del([config.app.datadir +'/*']);
     console.log('All data deleted');
@@ -111,7 +121,7 @@ function createTemplate(row) {
   console.log(title);
   var name = title.split('_');
   if (inArray(title, config.templates.ungrouped)) {
-  	var dir = config.app.datadir +'/ungrouped';
+    var dir = config.app.datadir +'/ungrouped';
   } else {
     var dir = config.app.datadir +'/'+ name.shift();
   }

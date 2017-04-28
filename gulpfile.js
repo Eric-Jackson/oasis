@@ -20,7 +20,7 @@ gulp.task("js", function () {
 });
 
 gulp.task('sass', function () {
-  return gulp.src('src/css/sass/**/*.scss')
+  return gulp.src('src/sass/**/*.scss')
     .pipe(sass())
     .pipe(gulp.dest('dist/themes/clement/css'))
     .pipe(cleanCSS({compatibility: 'ie8'}))
@@ -35,6 +35,6 @@ gulp.task('img', function() {
 });
 
 gulp.task('watch', function () {
-  gulp.watch('src/css/sass/**/*.scss', ['sass']);
+  gulp.watch('src/sass/**/*.scss', ['sass']);
   gulp.watch('src/js/**/*.js', ['js']);
 });
