@@ -2,7 +2,7 @@ var program = require('commander');
 var app = require('./templates.js');
 
 program
-  .version('0.0.1')
+  .version('0.0.1');
 
 program
   .command('init')

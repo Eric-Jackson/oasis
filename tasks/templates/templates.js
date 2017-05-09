@@ -1,160 +1,176 @@
-/*! Original code by Matslom https://github.com/Matslom/mybb-theme-editor
+!(function() {
+    /*! Original code by Matslom https://github.com/Matslom/mybb-theme-editor
     Modified by Eric Jackson http://digitalrelativity.com */
 
-"use strict";
-var config = require('./config.json');
-var watch = require('watch');
-var mysql = require('mysql');
-var del = require('del');
-var glob = require("glob");
-var mkdirp = require("mkdirp");
-var path = require('path');
-var fs = require('fs');
-var xml2js = require('xml2js');
-var Sequence = require('sequence').Sequence,
-               sequence = Sequence.create();
+    'use strict';
 
-module.exports = {
-  init: function(){
-    var connection = mysql.createConnection(config.mysql);
-    connection.connect();
+    const config   = require('./config.json'),
+          watch    = require('watch'),
+          mysql    = require('mysql'),
+          del      = require('del'),
+          glob     = require("glob"),
+          mkdirp   = require("mkdirp"),
+          path     = require('path'),
+          fs       = require('fs'),
+          xml2js   = require('xml2js');
+    
+    class Templates {
+        constructor() {
+            this.connection = mysql.createConnection(config.mysql);
+            this.queries = {
+                allTemplates: 'SELECT title, template, sid FROM ' + config.database.prefix + 'templates WHERE sid='+ config.templates.id + ' OR sid=-2',
+                updateTemplates: 'UPDATE '+ config.database.prefix +'templates SET template=\''+ addslashes(data) +'\' WHERE sid='+ config.templates.id +' AND title=\''+ name +'\''
+            };
+        }
 
-    sequence
-      .then(function(next){
-        mkdirp(config.app.datadir, function (err) {
-          if (err) console.error(err)
-          else console.log('dir created')
-        });
-        next();
-      })
-      .then(function(next){
-        connection.query('SELECT title, template, sid FROM ' + config.database.prefix + 'templates WHERE sid='+ config.templates.id + ' OR sid=-2', function(err, rows, fields) {
-          if (err) throw err;
-          for (var i = 0; i < rows.length; i++) {
-            createTemplate(rows[i]);
-          };
-        });
-        next();
-      });
+        init() {
+            this.connection.connect();
 
-      connection.end();
-  },
-  toFile: function(){
-    var connection = mysql.createConnection(config.mysql);
-    connection.connect();
+            let createDirectory = new Promise((resolve, reject) => {
+                mkdirp(config.app.datadir, error => {
+                    if (error) {
+                        console.error(error);
+                    } else {
+                        console.log(config.app.datadir + ' directory created.');
+                    }
+                });
+            });
 
-    connection.query('SELECT title, template, sid FROM ' + config.database.prefix +'templates WHERE sid='+ config.templates.id + ' OR sid=-2', function(err, rows, fields) {
-      if (err) throw err;
-      for (var i = 0; i < rows.length; i++) {
-        createTemplate(rows[i]);
-      };
-    });
+            createDirectory.then(() => {
+                this.connection.query(this.queries.allTemplates, function(err, rows, fields) {
+                    if (err) throw err;
+                    for (var i = 0; i < rows.length; i++) {
+                        createTemplate(rows[i]);
+                    }
+                });
+            });
 
-    connection.end();
-  },
-  toDb: function(){
-    var connection = mysql.createConnection(config.mysql);
-    connection.connect();
+            this.connection.end();
+        }
 
-    glob(config.app.datadir +'/**/*'+ config.app.fileext, function (err, files) {
-      if (err) throw err;
-      refreshDB(files, connection);
-    });
-  },
-  watch: function(){
-    var connection = mysql.createConnection(config.mysql);
-    connection.connect();
+        toFile() {
+            this.connection.connect();
 
-    watch.createMonitor(config.app.datadir, function (monitor) {
-      monitor.files[config.app.datadir +'/**/*'+ config.app.fileext];
-      console.log('watching');
-      monitor.on("changed", function (f, curr, prev) {
-        saveTemplate(f, connection);
-      })
-    });
-  },
-  loadThemeFile: function() {
-    var parser = new xml2js.Parser();
-    fs.readFile(__dirname + '/foo.xml', function(err, data) {
-      parser.parseString(data, function (err, result) {
-        console.dir(result);
-        console.log('Done');
-      });
-    });
-  },
-  clear: function(){
-    del([config.app.datadir +'/*']);
-    console.log('All data deleted');
-  }
-}
+            this.connection.query(this.queries.allTemplates, function(err, rows, fields) {
+                if (err) throw err;
+                for (var i = 0; i < rows.length; i++) {
+                    createTemplate(rows[i]);
+                }
+            });
 
-function saveTemplate(fullpath, connection) {
-  var filename = path.basename(fullpath, config.app.fileext);
-  fs.readFile(fullpath, 'utf8', function (err,data) {
-    if (err) {
-      return console.log(err);
+            this.connection.end();
+        }
+
+        toDb() {
+            this.connection.connect();
+
+            glob(config.app.datadir + '/**/*' + config.app.fileext, function (err, files) {
+                if (err) throw err;
+                refreshDB(files, connection);
+            });
+        }
+
+        watch() {
+            this.connection.connect();
+
+            watch.createMonitor(config.app.datadir, function (monitor) {
+                monitor.files[config.app.datadir + '/**/*' + config.app.fileext];
+                console.log('watching');
+                monitor.on("changed", function (f, curr, prev) {
+                    saveTemplate(f, connection);
+                });
+            });
+        }
+
+        // TODO: Make this work
+        loadThemeFile() {
+            var parser = new xml2js.Parser();
+            fs.readFile(__dirname + '/foo.xml', function(err, data) {
+                parser.parseString(data, function (err, result) {
+                    console.dir(result);
+                    console.log('Done');
+                });
+            });
+        }
+
+        updateDb(name, data, connection) {
+            connection.query(this.queries.updateTemplates, function (err, result) {
+                if (err) {
+                    throw err;
+                }
+                console.log('Template '+ name +' changed');
+            });
+        }
+
+        saveTemplate(fullpath, connection) {
+            var filename = path.basename(fullpath, config.app.fileext);
+            fs.readFile(fullpath, 'utf8', function (err,data) {
+                if (err) {
+                    return console.log(err);
+                }
+                this.updateDb(filename, data, connection);
+            });
+        }
+
+        clear() {
+            del([config.app.datadir +'/*']);
+            console.log('All data deleted');
+        }
     }
-    updateDbTemplate(filename, data, connection);
-  });
-}
 
-function updateDbTemplate(name, data, connection) {
-  connection.query('UPDATE '+ config.database.prefix +'templates SET template=\''+ addslashes(data) +'\' WHERE sid='+ config.templates.id +' AND title=\''+ name +'\'', function (err, result) {
-    if (err) throw err;
-    console.log('Template '+ name +' changed');
-  })
-}
+    function addslashes(string) {
+        return string.replace(/\\/g, '\\\\')
+                    .replace(/\u0008/g, '\\b')
+                    .replace(/\t/g, '\\t')
+                    .replace(/\n/g, '\\n')
+                    .replace(/\f/g, '\\f')
+                    .replace(/\r/g, '\\r')
+                    .replace(/'/g, '\\\'')
+                    .replace(/"/g, '\\"');
+    }
 
-function addslashes(string) {
-  return string.replace(/\\/g, '\\\\')
-               .replace(/\u0008/g, '\\b')
-               .replace(/\t/g, '\\t')
-               .replace(/\n/g, '\\n')
-               .replace(/\f/g, '\\f')
-               .replace(/\r/g, '\\r')
-               .replace(/'/g, '\\\'')
-               .replace(/"/g, '\\"');
-}
-
-function createTemplate(row) {
-  var title = row.title;
-  console.log(title);
-  var name = title.split('_');
-  if (inArray(title, config.templates.ungrouped)) {
-    var dir = config.app.datadir +'/ungrouped';
-  } else {
-    var dir = config.app.datadir +'/'+ name.shift();
-  }
-
-  sequence
-    .then(function(next){
-      mkdirp(dir, function (err) {
-        if (err) {
-          console.error(err);
+    function createTemplate(row) {
+        var title = row.title;
+        console.log(title);
+        var name = title.split('_');
+        var dir;
+        if (inArray(title, config.templates.ungrouped)) {
+            dir = config.app.datadir +'/ungrouped';
         } else {
-          console.log('Directory ' + dir + ' created.');
+            dir = config.app.datadir +'/'+ name.shift();
         }
-      });
-      next();
-    })
-    .then(function(next){
-      fs.writeFile(dir +'/'+ title + config.app.fileext, row.template, function(err) {
-        if(err) {
-          return console.log(err);
+
+        let createDirectory = new Promise((resolve, reject) => {
+            mkdirp(dir, error => {
+                if (error) {
+                    console.error(error);
+                } else {
+                    console.log(dir + ' directory created.');
+                }
+            });
+        });
+
+        createDirectory.then(() => {
+            fs.writeFile(dir +'/'+ title + config.app.fileext, row.template, function(err) {
+                if(err) {
+                    return console.log(err);
+                }
+                console.log("Template " + dir + '/' + title + config.app.fileext + " created.");
+            });
+        });
+    }
+
+    function inArray(string, array) {
+        return array.indexOf(string) != -1;
+    }
+
+    function refreshDB(file, connection) {
+        var summ = file.length;
+        for (var i = 0; i < file.length; i++) {
+            saveTemplate(file[i], connection);
         }
-        console.log("Template " + dir + '/' + title + config.app.fileext + " created.");
-      });
-      next();
-    });
-}
+    }
 
-function inArray(string, array) {
-  return array.indexOf(string) != -1;
-}
+}());
 
-function refreshDB(file, connection) {
-  var summ = file.length;
-  for (var i = 0; i < file.length; i++) {
-    saveTemplate(file[i], connection);
-  }
-}
+module.exports = new Templates();

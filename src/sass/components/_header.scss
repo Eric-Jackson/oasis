@@ -2,20 +2,20 @@
 	background: $primary-color;
 
 	.menu {
-		float: right;
 
 		&__item {
 
 			a {
 				color: #FFF;
 				font-weight: bold;
+				display: block;
 			}
 		}
 	}
 }
 
 .logo {
-    display: inline-block;
+	display: inline-block;
 
 	&__image {
 		width: 100%;
