@@ -1,5 +1,5 @@
-var program = require('commander');
-var app = require('./templates.js');
+const program = require('commander');
+const app = require('./templates.js');
 
 program
   .version('0.0.1');
