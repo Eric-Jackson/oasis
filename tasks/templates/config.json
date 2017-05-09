@@ -5,9 +5,9 @@
     "mysql": {
         "host": "localhost",
         "user": "root",
-        "password": "root",
+        "password": "",
         "database": "clement",
-        "port": 8889
+        "port": 3306
     },
     "app": {
         "datadir": "./src/templates",
