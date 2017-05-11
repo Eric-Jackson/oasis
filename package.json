@@ -26,7 +26,7 @@
   },
   "scripts": {
     "templates:file": "node ./tasks/templates/app.js file",
-    "templates:db": "node ./tasks/templates/app.js database",
+    "templates:db": "node ./tasks/templates/app.js db",
     "templates:watch": "node ./tasks/templates/app.js watch",
     "templates:delete": "node ./tasks/templates/app.js delete"
   }

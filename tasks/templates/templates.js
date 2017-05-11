@@ -18,32 +18,48 @@ module.exports = {
     connection: mysql.createConnection(config.mysql),
     queries: {
         allTemplates: 'SELECT title, template, sid FROM ' + config.database.prefix + 'templates WHERE sid='+ config.templates.id + ' OR sid=-2',
-        updateTemplates: (data, title) => {
-            return 'UPDATE ' + config.database.prefix + 'templates SET template=\'' + this.addslashes(data) + '\' WHERE sid=' + config.theme.id + ' AND title=\'' + title + '\'';
+        updateTemplates: function(data, title) {
+            return 'UPDATE ' + config.database.prefix + 'templates SET template=\'' + data + '\' WHERE sid=' + config.templates.id + ' AND title=\'' + title + '\'';
         }
     },
 
-    init: () => {
+    init: function() {
         this.connection.connect();
 
         let createDirectory = new Promise((resolve, reject) => {
             mkdirp(config.app.datadir, error => {
                 if (error) {
                     console.error(error);
+                    return reject();
                 } else {
                     console.log(config.app.datadir + ' directory created.');
+                    return resolve();
                 }
             });
         });
 
-        createDirectory.then(() => {
+        createDirectory.then(function() {
             this.toFile();
-        });
-
-        this.connection.end();
+        }.bind(this)).catch(function () {
+            console.log("Promise Rejected");
+        }).then(function() {
+            this.connection.end();
+        }.bind(this));
     },
 
-    createTemplate: row => {
+    toFile: function() {
+        this.connection.query(this.queries.allTemplates, function(err, rows, fields) {
+            if (err) {
+                Promise.reject();
+            } 
+            for (let i = 0; i < rows.length; i++) {
+                this.createTemplate(rows[i]);
+            }
+            Promise.resolve();
+        }.bind(this));
+    },
+
+    createTemplate: function(row) {
         let title = row.title,
             name = title.split('_'),
             dir;
@@ -58,68 +74,72 @@ module.exports = {
             mkdirp(dir, error => {
                 if (error) {
                     console.error(error);
+                    return reject();
                 } else {
                     console.log(dir + ' directory created.');
+                    return resolve();
                 }
             });
         });
 
-        createDirectory.then(() => {
+        createDirectory.then(function() {
             fs.writeFile(dir +'/'+ title + config.app.fileext, row.template, err => {
                 if(err) {
-                    return console.log(err);
+                    return Promise.reject();
                 }
                 console.log("Template " + dir + '/' + title + config.app.fileext + " created.");
+                return Promise.resolve();
             });
+        }).catch(function () {
+            console.log("Promise Rejected");
         });
     },
 
     inArray: (string, array) => array.indexOf(string) !== -1,
 
-    toFile: () => {
-        this.connection.query(this.queries.allTemplates, (err, rows, fields) => {
-            if (err) throw err;
-            for (let i = 0; i < rows.length; i++) {
-                this.createTemplate(rows[i]);
-            }
-        });
-    },
-
-    toDb: () => {
+    toDb: function() {
         this.connection.connect();
     
-        glob(config.app.datadir + '/**/*' + config.app.fileext, (err, files) => {
-            if (err) throw err;
-            for (let i = 0; i < files.length; i++) {
-                this.saveTemplate(files[i]);
-            }
+        let saveFiles = new Promise(function(resolve, reject) {
+            glob(config.app.datadir + '/**/*' + config.app.fileext, function(err, files) {
+                if (err) {
+                    Promise.reject();
+                } 
+                for (let i = 0; i < files.length; i++) {
+                    this.saveTemplate(files[i]);
+                    console.log(files[i] + ' was saved to the database.');
+                }
+                Promise.resolve();
+            }.bind(this));
+        }.bind(this)).then(function() {
+            this.connection.end();
+        }).catch(function () {
+            console.log("Promise Rejected");
         });
-
-        this.connection.end();
     },
 
-    saveTemplate(fullpath) {
+    saveTemplate: function(fullpath) {
         let filename = path.basename(fullpath, config.app.fileext);
-        fs.readFile(fullpath, 'utf8', (err, data) => {
+        fs.readFile(fullpath, 'utf8', function(err, data) {
             if (err) {
                 return console.log(err);
             }
-            this.connection.query(this.queries.updateTemplates(data, filename), (err, result) => {
+            let cleanData = this.addSlashes(data);
+            this.connection.query(this.queries.updateTemplates(cleanData, filename), (err, result) => {
                 if (err) {
                     throw err;
                 }
-                console.log('Template '+ filename +' changed');
             });
-        });
+        }.bind(this));
     },
 
-    watch: () => {
+    watch: function() {
         this.connection.connect();
     
-        watch.createMonitor(config.app.datadir, monitor => {
+        watch.createMonitor(config.app.datadir, function(monitor) {
             monitor.files = config.app.datadir + '/**/*' + config.app.fileext;
             console.log('Watching ' + config.app.datadir);
-            monitor.on("changed", (f, curr, prev) => {
+            monitor.on("changed", function(f, curr, prev)  {
                 this.saveTemplate(f);
             });
         });
