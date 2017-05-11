@@ -25,10 +25,9 @@
     "xml2js": "^0.4.17"
   },
   "scripts": {
-    "templates:download": "node ./tasks/templates/app.js init",
-    "templates:upload": "node ./tasks/templates/app.js upload",
+    "templates:file": "node ./tasks/templates/app.js file",
+    "templates:db": "node ./tasks/templates/app.js database",
     "templates:watch": "node ./tasks/templates/app.js watch",
-    "templates:reset": "node ./tasks/templates/app.js reset",
     "templates:delete": "node ./tasks/templates/app.js delete"
   }
 }
