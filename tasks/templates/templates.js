@@ -103,17 +103,22 @@ module.exports = {
         let saveFiles = new Promise(function(resolve, reject) {
             glob(config.app.datadir + '/**/*' + config.app.fileext, function(err, files) {
                 if (err) {
-                    Promise.reject();
+                    console.log(err);
+                    reject();
                 } 
                 for (let i = 0; i < files.length; i++) {
                     this.saveTemplate(files[i]);
                     console.log(files[i] + ' was saved to the database.');
                 }
-                Promise.resolve();
+                resolve();
             }.bind(this));
-        }.bind(this)).then(function() {
+        }.bind(this));
+        
+        saveFiles.then(function() {
             this.connection.end();
-        }).catch(function () {
+        })
+        
+        .catch(function () {
             console.log("Promise Rejected");
         });
     },
