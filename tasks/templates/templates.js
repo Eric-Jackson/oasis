@@ -96,27 +96,29 @@ module.exports = {
             });
         });
 
-        createDirectory.then(function() {
-            fs.writeFile(dir +'/'+ title + config.app.fileext, row.template, err => {
-                if(err) {
-                    return Promise.reject();
-                }
-                console.log("Template " + dir + '/' + title + config.app.fileext + " created.");
-                return Promise.resolve();
-            });
-        }).catch(function () {
-            console.log("Promise Rejected");
-        });
+        createDirectory
+            .then(_this.createFile(dir +'/'+ title + config.app.fileext, row.template))
+            .catch(() => console.log("Promise Rejected"));
     },
 
     inArray: (string, array) => array.indexOf(string) !== -1,
+
+    createFile: function(filename, dbTemplate) {
+        return new Promise((resolve, reject) => {
+            fs.writeFile(filename, dbTemplate, err => {
+                if(err) {
+                    return Promise.reject();
+                }
+                console.log("Template " + filename + " created.");
+                return Promise.resolve();
+            });
+        });
+    },
 
     toDb: function() {
         const _this = this;
 
         _this.connection.connect();
-    
-        let promiseStack = [];
         let saveFiles = new Promise(function(resolve, reject) {
             glob(config.app.datadir + '/**/*' + config.app.fileext, function(err, files) {
                 if (err) {
@@ -124,13 +126,13 @@ module.exports = {
                     reject();
                 } 
                 for (let i = 0; i < files.length; i++) {
-                    promiseStack.push(_this.saveTemplate(files[i]));
+                    _this.saveTemplate(files[i]);
                     console.log(files[i] + ' was saved to the database.');
                 }
             });
         });
         
-        Promise.all(promiseStack).then(function() {
+        saveFiles.then(function() {
             _this.connection.end();
         })
         
@@ -143,17 +145,21 @@ module.exports = {
         const _this = this;
         let filename = path.basename(fullpath, config.app.fileext);
 
-        fs.readFile(fullpath, 'utf8', function(err, data) {
-            if (err) {
-                return console.log(err);
-            }
-            let cleanData = _this.addSlashes(data);
-            _this.connection.query(_this.queries.updateTemplates(cleanData, filename), (err, result) => {
+        return new Promise((resolve, reject) => {
+            fs.readFile(fullpath, 'utf8', function(err, data) {
                 if (err) {
-                    throw err;
+                    console.log(err);
+                    return reject();
                 }
+                let cleanData = _this.addSlashes(data);
+                _this.connection.query(_this.queries.updateTemplates(cleanData, filename), (err, result) => {
+                    if (err) {
+                        console.log(err);
+                        return reject();
+                    }
 
-                return Promise.resolve();
+                    return resolve();
+                });
             });
         });
     },
