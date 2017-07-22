@@ -8,8 +8,8 @@ const config   = require('./config.json'),
       msg      = require('./messages.js'),
       fs       = require('fs-extra'),
       mysql    = require('promise-mysql'),
+      glob     = require("glob-promise"),
       watch    = require('watch'),
-      glob     = require("glob"),
       path     = require('path'),
       xml2js   = require('xml2js');
 
@@ -30,9 +30,9 @@ module.exports = {
         connect
             .then(conn => {
                 connection = conn;
-                return _this.getCustomTemplates(connection);
+                return _this.getDefaultTemplates(connection);
             })
-            .then(() => _this.getDefaultTemplates(connection))
+            .then(() => _this.getCustomTemplates(connection))
             .then(() => connection.end())
             .catch(e => msg.error(e));
     },
@@ -83,9 +83,11 @@ module.exports = {
     },
 
     createFile: function(filename, dbTemplate, current, max) {
-        let newFile = fs.outputFile(filename, dbTemplate);
-        msg.newFileCount(filename, current, max);
-        return newFile;
+        return fs.outputFile(filename, dbTemplate)
+                .then(() => {
+                    msg.newFileCount(filename, current, max);
+                    Promise.resolve(filename);
+                });
     },
 
     delete: () => {
@@ -93,80 +95,67 @@ module.exports = {
                  .then(console.log("Deleted folder and all contents: " + config.app.datadir));
     },
 
-    // toDb: function() {
-    //     const _this = this;
+    toDb: function() {
+        const _this = this;
+        let connect = mysql.createConnection(config.mysql),
+            connection;
 
-    //     _this.connection.connect();
-    //     let saveFiles = new Promise(function(resolve, reject) {
-    //         glob(config.app.datadir + '/**/*' + config.app.fileext, function(err, files) {
-    //             if (err) {
-    //                 console.log(err);
-    //                 reject();
-    //             } 
-    //             for (let i = 0; i < files.length; i++) {
-    //                 _this.saveTemplate(files[i]);
-    //                 console.log(files[i] + ' was saved to the database.');
-    //             }
-    //         });
-    //     });
+        connect
+            .then(conn => {
+                connection = conn;
+                return _this.saveAll(connection);
+            })
+            .then(() => connection.end())
+            .catch(e => msg.error(e));
+    },
+
+    saveAll: function(connection) {
+        const _this = this;
+        let promises = [];
+
+        return glob(config.app.datadir + '/**/*' + config.app.fileext)
+            .then(files => {
+                for (let i = 0; i < files.length; i++) {
+                    promises.push(_this.saveTemplate(connection, files[i]));
+                }
+
+                return Promise.all(promises);
+            })
+            .then(() => console.log("Finished saving all to database."))
+            .catch(e => msg.error(e));
+    },
+
+    saveTemplate: function(connection, fullpath) {
+        const _this = this;
+        let filename = path.basename(fullpath, config.app.fileext);
+        return fs.readFile(fullpath, 'utf8')
+                 .then(data => {
+                     let cleanData = utils.addSlashes(data);
+                     console.log(filename + ' was saved to the database.');
+                     return connection.query(_this.queries.updateTemplates(cleanData, filename));
+                 })
+                 .catch(e => msg.error(e));
+    },
+
+    watch: function() {
+        const _this = this;
+        let connect = mysql.createPool(config.mysql),
+            connection;
         
-    //     saveFiles.then(function() {
-    //         _this.connection.end();
-    //     })
+        connect.getConnection()
+            .then((conn) => {
+                connection = conn;
+                watch.createMonitor(config.app.datadir, function(monitor) {
+                    monitor.files = config.app.datadir + '/**/*' + config.app.fileext;
+                    console.log('Watching ' + config.app.datadir);
+                    monitor.on("changed", function(f, curr, prev)  {
+                        _this.saveTemplate(connection, f);
+                    });
+                });
+            })
+            .catch(e => msg.error(e));
         
-    //     .catch(function () {
-    //         console.log("Promise Rejected");
-    //     });
-    // },
-
-    // saveTemplate: function(fullpath) {
-    //     const _this = this;
-    //     let filename = path.basename(fullpath, config.app.fileext);
-
-    //     return new Promise((resolve, reject) => {
-    //         fs.readFile(fullpath, 'utf8', function(err, data) {
-    //             if (err) {
-    //                 console.log(err);
-    //                 return reject();
-    //             }
-    //             let cleanData = _this.addSlashes(data);
-    //             _this.connection.query(_this.queries.updateTemplates(cleanData, filename), (err, result) => {
-    //                 if (err) {
-    //                     console.log(err);
-    //                     return reject();
-    //                 }
-
-    //                 return resolve(result);
-    //             });
-    //         });
-    //     });
-    // },
-
-    // watch: function() {
-    //     const _this = this;
-    //     _this.connection.connect();
-    
-    //     watch.createMonitor(config.app.datadir, function(monitor) {
-    //         monitor.files = config.app.datadir + '/**/*' + config.app.fileext;
-    //         console.log('Watching ' + config.app.datadir);
-    //         monitor.on("changed", function(f, curr, prev)  {
-    //             _this.saveTemplate(f);
-    //         });
-    //     });
-    // },
-
-    inArray: (string, array) => array.indexOf(string) !== -1,
-
-    addSlashes: string => {
-        return string.replace(/\\/g, '\\\\')
-                     .replace(/\u0008/g, '\\b')
-                     .replace(/\t/g, '\\t')
-                     .replace(/\n/g, '\\n')
-                     .replace(/\f/g, '\\f')
-                     .replace(/\r/g, '\\r')
-                     .replace(/'/g, '\\\'')
-                     .replace(/"/g, '\\"');
-    }
+    },
 };
 
 // // TODO: Make this work
