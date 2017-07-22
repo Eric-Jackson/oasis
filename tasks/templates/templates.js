@@ -4,20 +4,19 @@ Modified by Eric Jackson http://digitalrelativity.com */
 'use strict';
 
 const config   = require('./config.json'),
+      utils    = require('./utils.js'),
+      msg      = require('./messages.js'),
+      fs       = require('fs-extra'),
+      mysql    = require('promise-mysql'),
       watch    = require('watch'),
-      mysql    = require('mysql'),
-      del      = require('del'),
       glob     = require("glob"),
-      mkdirp   = require("mkdirp"),
       path     = require('path'),
-      fs       = require('fs'),
       xml2js   = require('xml2js');
 
 module.exports = {
-
-    connection: mysql.createConnection(config.mysql),
     queries: {
-        allTemplates: 'SELECT title, template, sid FROM ' + config.database.prefix + 'templates WHERE sid='+ config.templates.id + ' OR sid=-2',
+        customTemplates: 'SELECT title, template, sid, version FROM ' + config.database.prefix + 'templates WHERE sid='+ config.templates.id,
+        defaultTemplates: 'SELECT title, template, sid, version FROM ' + config.database.prefix + 'templates WHERE sid=-2',
         updateTemplates: function(data, title) {
             return 'UPDATE ' + config.database.prefix + 'templates SET template=\'' + data + '\' WHERE sid=' + config.templates.id + ' AND title=\'' + title + '\'';
         }
@@ -25,162 +24,138 @@ module.exports = {
 
     init: function() {
         const _this = this;
+        let connect = mysql.createConnection(config.mysql),
+            connection;
         
-        _this.connection.connect();
-
-        let createMainDirectory = new Promise((resolve, reject) => {
-            resolve(_this.createDirectory(config.app.datadir));
-        });
-
-        createMainDirectory
-            .then(console.log("Main directory created"))
-            .then(_this.toFile())
-            .then(console.log("Things are filed"))
-            .then(_this.connection.end())
-            .then(console.log("Everything is finished"))
-            .catch(() => console.log("Promise Rejected") );
+        connect
+            .then(conn => {
+                connection = conn;
+                return _this.getCustomTemplates(connection);
+            })
+            .then(() => _this.getDefaultTemplates(connection))
+            .then(() => connection.end())
+            .catch(e => msg.error(e));
     },
 
-    createDirectory: function(directory) {
-        return new Promise((resolve, reject) => {
-            mkdirp(directory, error => {
-                if (error) {
-                    console.error(error);
-                    return reject();
-                } else {
-                    console.log(config.app.datadir + ' directory created.');
-                    return resolve();
-                }
-            });
-        });
-    },
-
-    toFile: function() {
+    getTemplates: function(connection, query) {
         const _this = this;
+        let promises = [];
 
-        return new Promise((resolve, reject) => {
-            _this.connection.query(_this.queries.allTemplates, function(err, rows, fields) {
-                if (err) {
-                    reject();
-                } 
+        return connection.query(query)
+            .then(rows => {
                 for (let i = 0; i < rows.length; i++) {
-                    _this.createTemplate(rows[i]);
+                    promises.push(_this.setupFile(rows[i], i, rows.length));
                 }
-                resolve();
-            });
-        });
+
+                return promises;
+            })
+            .then(() => {
+                return Promise.all(promises)
+                    .then(console.log("Finished getting template set."));
+            })
+            .catch(e => msg.error(e));
     },
 
-    createTemplate: function(row) {
+    getDefaultTemplates: function(connection) {
+        const _this = this;
+        return _this.getTemplates(connection, _this.queries.defaultTemplates);
+    },
+
+    getCustomTemplates: function(connection) {
+        const _this = this;
+        return _this.getTemplates(connection, _this.queries.customTemplates);
+    },
+    
+    setupFile: function(template, currentIndex, templateAmount) {
         const _this = this;
 
-        let title = row.title,
+        let title = template.title,
             name = title.split('_'),
             dir;
 
-        if (_this.inArray(title, config.templates.ungrouped)) {
+        if (utils.inArray(title, config.templates.ungrouped)) {
             dir = config.app.datadir +'/ungrouped';
         } else {
             dir = config.app.datadir +'/'+ name.shift();
         }
 
-        let createDirectory = new Promise((resolve, reject) => {
-            mkdirp(dir, error => {
-                if (error) {
-                    console.error(error);
-                    return reject();
-                } else {
-                    console.log(dir + ' directory created.');
-                    return resolve();
-                }
-            });
-        });
-
-        createDirectory
-            .then(_this.createFile(dir +'/'+ title + config.app.fileext, row.template))
-            .catch(() => console.log("Promise Rejected"));
+        return _this.createFile(dir + "/" + title + config.app.fileext, template.template, currentIndex, templateAmount);
     },
 
-    inArray: (string, array) => array.indexOf(string) !== -1,
-
-    createFile: function(filename, dbTemplate) {
-        return new Promise((resolve, reject) => {
-            fs.writeFile(filename, dbTemplate, err => {
-                if(err) {
-                    return Promise.reject();
-                }
-                console.log("Template " + filename + " created.");
-                return Promise.resolve();
-            });
-        });
-    },
-
-    toDb: function() {
-        const _this = this;
-
-        _this.connection.connect();
-        let saveFiles = new Promise(function(resolve, reject) {
-            glob(config.app.datadir + '/**/*' + config.app.fileext, function(err, files) {
-                if (err) {
-                    console.log(err);
-                    reject();
-                } 
-                for (let i = 0; i < files.length; i++) {
-                    _this.saveTemplate(files[i]);
-                    console.log(files[i] + ' was saved to the database.');
-                }
-            });
-        });
-        
-        saveFiles.then(function() {
-            _this.connection.end();
-        })
-        
-        .catch(function () {
-            console.log("Promise Rejected");
-        });
-    },
-
-    saveTemplate: function(fullpath) {
-        const _this = this;
-        let filename = path.basename(fullpath, config.app.fileext);
-
-        return new Promise((resolve, reject) => {
-            fs.readFile(fullpath, 'utf8', function(err, data) {
-                if (err) {
-                    console.log(err);
-                    return reject();
-                }
-                let cleanData = _this.addSlashes(data);
-                _this.connection.query(_this.queries.updateTemplates(cleanData, filename), (err, result) => {
-                    if (err) {
-                        console.log(err);
-                        return reject();
-                    }
-
-                    return resolve();
-                });
-            });
-        });
-    },
-
-    watch: function() {
-        const _this = this;
-        _this.connection.connect();
-    
-        watch.createMonitor(config.app.datadir, function(monitor) {
-            monitor.files = config.app.datadir + '/**/*' + config.app.fileext;
-            console.log('Watching ' + config.app.datadir);
-            monitor.on("changed", function(f, curr, prev)  {
-                _this.saveTemplate(f);
-            });
-        });
+    createFile: function(filename, dbTemplate, current, max) {
+        let newFile = fs.outputFile(filename, dbTemplate);
+        msg.newFileCount(filename, current, max);
+        return newFile;
     },
 
     delete: () => {
-        del([config.app.datadir +'/*']);
-        console.log('All data deleted');
+        return fs.remove(config.app.datadir)
+                 .then(console.log("Deleted folder and all contents: " + config.app.datadir));
     },
+
+    // toDb: function() {
+    //     const _this = this;
+
+    //     _this.connection.connect();
+    //     let saveFiles = new Promise(function(resolve, reject) {
+    //         glob(config.app.datadir + '/**/*' + config.app.fileext, function(err, files) {
+    //             if (err) {
+    //                 console.log(err);
+    //                 reject();
+    //             } 
+    //             for (let i = 0; i < files.length; i++) {
+    //                 _this.saveTemplate(files[i]);
+    //                 console.log(files[i] + ' was saved to the database.');
+    //             }
+    //         });
+    //     });
+        
+    //     saveFiles.then(function() {
+    //         _this.connection.end();
+    //     })
+        
+    //     .catch(function () {
+    //         console.log("Promise Rejected");
+    //     });
+    // },
+
+    // saveTemplate: function(fullpath) {
+    //     const _this = this;
+    //     let filename = path.basename(fullpath, config.app.fileext);
+
+    //     return new Promise((resolve, reject) => {
+    //         fs.readFile(fullpath, 'utf8', function(err, data) {
+    //             if (err) {
+    //                 console.log(err);
+    //                 return reject();
+    //             }
+    //             let cleanData = _this.addSlashes(data);
+    //             _this.connection.query(_this.queries.updateTemplates(cleanData, filename), (err, result) => {
+    //                 if (err) {
+    //                     console.log(err);
+    //                     return reject();
+    //                 }
+
+    //                 return resolve(result);
+    //             });
+    //         });
+    //     });
+    // },
+
+    // watch: function() {
+    //     const _this = this;
+    //     _this.connection.connect();
+    
+    //     watch.createMonitor(config.app.datadir, function(monitor) {
+    //         monitor.files = config.app.datadir + '/**/*' + config.app.fileext;
+    //         console.log('Watching ' + config.app.datadir);
+    //         monitor.on("changed", function(f, curr, prev)  {
+    //             _this.saveTemplate(f);
+    //         });
+    //     });
+    // },
+
+    inArray: (string, array) => array.indexOf(string) !== -1,
 
     addSlashes: string => {
         return string.replace(/\\/g, '\\\\')
