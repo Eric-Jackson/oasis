@@ -1,5 +1,5 @@
 # Clement
-Modern MyBB theme that uses a modern workflow.
+Modern MyBB theme that uses a modern workflow, with ES6, SCSS, and many more possibilities with [npm](https://npmjs.com).
 
 ## Templates
 Download the zip and put it in your root/themes folder.
@@ -21,7 +21,7 @@ Run `npm run templates:delete` to delete all local files. BE CAREFUL.
 Run `npm run templates:watch` to save template files to the database as they change.
 
 ## CSS/JS/Images
-Include the files `./dist/themes/oasis/css/main.min.css` and `./dist/themes/oasis/js/main.min.js` in your headerinclude. For example:
+Include the files `./dist/themes/oasis/css/main.min.css` and `./dist/themes/oasis/js/main.min.js` in your headerinclude somewhere after `{$stylesheets}`. (Optionally you can remove it entirely) For example:
 ```html
 <link rel="stylesheet" type="text/css" href="themes/oasis/dist/themes/oasis/css/main.min.css" />
 <script type="text/javascript" src="themes/oasis/dist/themes/oasis/js/main.min.js"></script>
