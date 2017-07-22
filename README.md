@@ -41,3 +41,8 @@ Run `gulp img` to compress your images. This compresses images in `./src/images`
 ### Watch
 Run `gulp watch` to automate both JS and CSS transpiling while you edit.
 
+## To Do
+- [ ] Use webpack
+- [ ] Convert theme files to files
+- [ ] Build theme file from local files
+- [ ] Database CSS to files
