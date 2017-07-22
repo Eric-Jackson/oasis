@@ -30,13 +30,13 @@ Include the files `./dist/themes/oasis/css/main.min.css` and `./dist/themes/oasi
 Set your image directory to `themes/oasis/dist/themes/oasis/images` and your logo directory to `themes/oasis/dist/themes/oasis/images/logo.png`
 
 ### JS
-Run `gulp js` to transpile your Javascript into ES5 and compress it.
+Run `gulp js` to transpile your Javascript into ES5 and compress it. Make edits to the files in `./src/js`.
 
 ### CSS
-Run `gulp sass` to transpile your Sass into CSS and compress it.
+Run `gulp sass` to transpile your Sass into CSS and compress it. Make edits to the files in `./src/sass`.
 
 ### Images
-Run `gulp img` to compress your images.
+Run `gulp img` to compress your images. This compresses images in `./src/images` and places them in `./dist/images`.
 
 ### Watch
 Run `gulp watch` to automate both JS and CSS transpiling while you edit.
