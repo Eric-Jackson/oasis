@@ -1,6 +1,8 @@
 # Clement
 Modern MyBB theme that uses a modern workflow, with ES6, SCSS, and many more possibilities with [npm](https://npmjs.com).
 
+[Usage Example](http://recordit.co/KSoIjecyDl)
+
 ## Templates
 Download the zip and extract it in your root/themes folder.
 
