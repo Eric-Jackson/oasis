@@ -2,7 +2,7 @@
 Modern MyBB theme that uses a modern workflow, with ES6, SCSS, and many more possibilities with [npm](https://npmjs.com).
 
 ## Templates
-Download the zip and put it in your root/themes folder.
+Download the zip and extract it in your root/themes folder.
 
 Run `npm install` inside the directory.
 
@@ -46,3 +46,4 @@ Run `gulp watch` to automate both JS and CSS transpiling while you edit.
 - [ ] Convert theme files to files
 - [ ] Build theme file from local files
 - [ ] Database CSS to files
+- [ ] Add gulp build task
