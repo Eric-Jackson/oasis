@@ -11,7 +11,8 @@ const config   = require('./config.json'),
       glob     = require("glob-promise"),
       watch    = require('watch'),
       path     = require('path'),
-      xml2js   = require('xml2js');
+      xml2js   = require('xml2js'),
+      builder  = require('xmlbuilder');
 
 module.exports = {
     queries: {
@@ -87,12 +88,14 @@ module.exports = {
                 .then(() => {
                     msg.newFileCount(filename, current, max);
                     Promise.resolve(filename);
-                });
+                })
+                .catch(e => msg.error(e));
     },
 
     delete: () => {
         return fs.remove(config.app.datadir)
-                 .then(console.log("Deleted folder and all contents: " + config.app.datadir));
+                 .then(console.log("Deleted folder and all contents: " + config.app.datadir))
+                 .catch(e => msg.error(e));
     },
 
     toDb: function() {
@@ -129,12 +132,12 @@ module.exports = {
         const _this = this;
         let filename = path.basename(fullpath, config.app.fileext);
         return fs.readFile(fullpath, 'utf8')
-                 .then(data => {
-                     let cleanData = utils.addSlashes(data);
-                     console.log(filename + ' was saved to the database.');
-                     return connection.query(_this.queries.updateTemplates(cleanData, filename));
-                 })
-                 .catch(e => msg.error(e));
+            .then(data => {
+                let cleanData = utils.addSlashes(data);
+                console.log(filename + ' was saved to the database.');
+                return connection.query(_this.queries.updateTemplates(cleanData, filename));
+            })
+            .catch(e => msg.error(e));
     },
 
     watch: function() {
@@ -148,7 +151,7 @@ module.exports = {
                 watch.createMonitor(config.app.datadir, function(monitor) {
                     monitor.files = config.app.datadir + '/**/*' + config.app.fileext;
                     console.log('Watching ' + config.app.datadir);
-                    monitor.on("changed", function(f, curr, prev)  {
+                    monitor.on("changed", function(f, curr, prev) {
                         _this.saveTemplate(connection, f);
                     });
                 });
@@ -156,15 +159,76 @@ module.exports = {
             .catch(e => msg.error(e));
         
     },
-};
 
-// // TODO: Make this work
-// loadThemeFile() {
-//     let parser = new xml2js.Parser();
-//     fs.readFile(__dirname + '/foo.xml', function(err, data) {
-//         parser.parseString(data, function (err, result) {
-//             console.dir(result);
-//             console.log('Done');
-//         });
-//     });
-// }
+    createThemeFile: function() {
+        fs.readdir(config.app.datadir)
+        .then(folders => 
+            Promise.all(
+                folders.map(folder =>
+                    fs.readdir(`${config.app.datadir}/${folder}`)
+                    .then(files =>
+                        Promise.all(
+                            files.map(file => {
+                                return new Promise(function(resolve, reject) {
+                                    resolve(`${config.app.datadir}/${folder}/${file}`);
+                                });
+                            })
+                        )
+                    )
+                    .catch(e => msg.error(e))
+                )
+            )
+        )
+        .then(data => {
+            console.log();
+            data = [].concat.apply([], data);
+            var root = builder.create('squares');
+
+            data.forEach(function(filename) {
+                fs.readFile(filename, 'utf-8', function(err, content) {
+                    if (err) {
+                        msg.error(err);
+                        return;
+                    }
+                    
+                    console.log(content);
+                });
+            });
+        })
+        .catch(e => msg.error(e));
+    }
+
+        // let xml = builder.create('root')
+        //         .ele('xmlbuilder')
+        //             .ele('repo', {'type': 'git'}, 'git://github.com/oozcitak/xmlbuilder-js.git')
+        //         .end({ pretty: true});
+
+    // loadThemeFile() {
+    //     let parser = new xml2js.Parser();
+    //     fs.readFile(__dirname + '/foo.xml', function(err, data) {
+    //         parser.parseString(data, function (err, result) {
+    //             console.dir(result);
+    //             console.log('Done');
+    //         });
+    //     });
+
+    //         foreach($theme['properties'] as $property => $value)
+    //         {
+    //             if($property == "tag" || $property == "value")
+    //             {
+    //                 continue;
+    //             }
+    //             if($property == 'colors' || $property == 'disporder')
+    //             {
+    //                 $data = my_unserialize($value['value']);
+    //                 if(!is_array($data))
+    //                 {
+    //                     // Bad data?
+    //                     continue;
+    //                 }
+    //                 $value['value'] = $data;
+    //             }
+    //             $properties[$property] = $value['value'];
+    //         }
+    // }
+};

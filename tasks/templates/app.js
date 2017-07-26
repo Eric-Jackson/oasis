@@ -32,4 +32,11 @@ program
     oasis.delete();
   });
 
+program
+  .command('build-theme')
+  .description('Build theme file')
+  .action(function(env, options){
+    oasis.createThemeFile();
+  });
+
 program.parse(process.argv);

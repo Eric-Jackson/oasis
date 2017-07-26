@@ -19,12 +19,14 @@
     "gulp-sass": "^2.3.2",
     "promise-mysql": "^3.0.2",
     "watch": "^1.0.2",
-    "xml2js": "^0.4.17"
+    "xml2js": "^0.4.17",
+    "xmlbuilder": "^9.0.1"
   },
   "scripts": {
     "templates:file": "node ./tasks/templates/app.js file",
     "templates:db": "node ./tasks/templates/app.js db",
     "templates:watch": "node ./tasks/templates/app.js watch",
-    "templates:delete": "node ./tasks/templates/app.js delete"
+    "templates:delete": "node ./tasks/templates/app.js delete",
+    "theme:build": "node ./tasks/templates/app.js build-theme"
   }
 }
