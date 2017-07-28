@@ -15,20 +15,23 @@ const config   = require('./config.json'),
       builder  = require('xmlbuilder');
 
 module.exports = {
+    
+    // Store queries we plan to use throughout the app
     queries: {
-        customTemplates: 'SELECT title, template, sid, version FROM ' + config.database.prefix + 'templates WHERE sid='+ config.templates.id,
-        defaultTemplates: 'SELECT title, template, sid, version FROM ' + config.database.prefix + 'templates WHERE sid=-2',
+        customTemplates: `SELECT title, template, sid, version FROM ${config.database.prefix}templates WHERE sid=${config.templates.id}`,
+        defaultTemplates: `SELECT title, template, sid, version FROM ${config.database.prefix}templates WHERE sid=-2`,
         updateTemplates: function(data, title) {
-            return 'UPDATE ' + config.database.prefix + 'templates SET template=\'' + data + '\' WHERE sid=' + config.templates.id + ' AND title=\'' + title + '\'';
+            return `UPDATE ${config.database.prefix}templates SET template='${data}' WHERE sid=${config.templates.id} AND title='${title}'`;
         }
     },
 
+    
     init: function() {
         const _this = this;
-        let connect = mysql.createConnection(config.mysql),
+        let connect = mysql.createConnection,
             connection;
         
-        connect
+        connect(config.mysql)
             .then(conn => {
                 connection = conn;
                 return _this.getDefaultTemplates(connection);
@@ -75,12 +78,12 @@ module.exports = {
             dir;
 
         if (utils.inArray(title, config.templates.ungrouped)) {
-            dir = config.app.datadir +'/ungrouped';
+            dir = `${config.app.datadir}/ungrouped`;
         } else {
             dir = config.app.datadir +'/'+ name.shift();
         }
 
-        return _this.createFile(dir + "/" + title + config.app.fileext, template.template, currentIndex, templateAmount);
+        return _this.createFile(`${dir}/${title}${config.app.fileext}`, template.template, currentIndex, templateAmount);
     },
 
     createFile: function(filename, dbTemplate, current, max) {
@@ -180,7 +183,6 @@ module.exports = {
             )
         )
         .then(data => {
-            console.log();
             data = [].concat.apply([], data);
             var root = builder.create('squares');
 
