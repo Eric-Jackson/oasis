@@ -80,7 +80,7 @@ module.exports = {
         if (utils.inArray(title, config.templates.ungrouped)) {
             dir = `${config.app.datadir}/ungrouped`;
         } else {
-            dir = config.app.datadir +'/'+ name.shift();
+            dir = `${config.app.datadir}/${name.shift}`;
         }
 
         return _this.createFile(`${dir}/${title}${config.app.fileext}`, template.template, currentIndex, templateAmount);
@@ -152,7 +152,7 @@ module.exports = {
             .then((conn) => {
                 connection = conn;
                 watch.createMonitor(config.app.datadir, function(monitor) {
-                    monitor.files = config.app.datadir + '/**/*' + config.app.fileext;
+                    monitor.files = `${config.app.datadir}/**/*${config.app.fileext}`;
                     console.log('Watching ' + config.app.datadir);
                     monitor.on("changed", function(f, curr, prev) {
                         _this.saveTemplate(connection, f);
