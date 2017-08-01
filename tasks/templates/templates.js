@@ -55,7 +55,7 @@ module.exports = {
             })
             .then(() => {
                 return Promise.all(promises)
-                    .then(console.log("Finished getting template set."));
+                    .then(msg.gotTemplates());
             })
             .catch(e => msg.error(e));
     },
@@ -80,7 +80,7 @@ module.exports = {
         if (utils.inArray(title, config.templates.ungrouped)) {
             dir = `${config.app.datadir}/ungrouped`;
         } else {
-            dir = `${config.app.datadir}/${name.shift}`;
+            dir = `${config.app.datadir}/${name.shift()}`;
         }
 
         return _this.createFile(`${dir}/${title}${config.app.fileext}`, template.template, currentIndex, templateAmount);
@@ -97,7 +97,7 @@ module.exports = {
 
     delete: () => {
         return fs.remove(config.app.datadir)
-                 .then(console.log("Deleted folder and all contents: " + config.app.datadir))
+                 .then(msg.deleteDir(config.app.datadir))
                  .catch(e => msg.error(e));
     },
 
@@ -119,7 +119,7 @@ module.exports = {
         const _this = this;
         let promises = [];
 
-        return glob(config.app.datadir + '/**/*' + config.app.fileext)
+        return glob(`${config.app.datadir}/**/*${config.app.fileext}`)
             .then(files => {
                 for (let i = 0; i < files.length; i++) {
                     promises.push(_this.saveTemplate(connection, files[i]));
@@ -127,7 +127,7 @@ module.exports = {
 
                 return Promise.all(promises);
             })
-            .then(() => console.log("Finished saving all to database."))
+            .then(() => )
             .catch(e => msg.error(e));
     },
 
@@ -137,7 +137,7 @@ module.exports = {
         return fs.readFile(fullpath, 'utf8')
             .then(data => {
                 let cleanData = utils.addSlashes(data);
-                console.log(filename + ' was saved to the database.');
+                msg.savedFile(filename);
                 return connection.query(_this.queries.updateTemplates(cleanData, filename));
             })
             .catch(e => msg.error(e));
@@ -153,7 +153,7 @@ module.exports = {
                 connection = conn;
                 watch.createMonitor(config.app.datadir, function(monitor) {
                     monitor.files = `${config.app.datadir}/**/*${config.app.fileext}`;
-                    console.log('Watching ' + config.app.datadir);
+                    msg.watching(config.app.datadir);
                     monitor.on("changed", function(f, curr, prev) {
                         _this.saveTemplate(connection, f);
                     });
