@@ -25,7 +25,9 @@ module.exports = {
         }
     },
 
-    
+    /**
+     * Build the initial theme and related files
+     */
     init: function() {
         const _this = this;
         let connect = mysql.createConnection,
@@ -41,6 +43,14 @@ module.exports = {
             .catch(e => msg.error(e));
     },
 
+    /**
+     * Load theme templates from the database.
+     *
+     * @param connection - The currently active SQL connection when called.
+     * @param query - The query to be run against the database.
+     *
+     * @return Promise.
+     */
     getTemplates: function(connection, query) {
         const _this = this;
         let promises = [];
@@ -60,11 +70,25 @@ module.exports = {
             .catch(e => msg.error(e));
     },
 
+    /**
+     * Load default theme templates from the database.
+     *
+     * @param connection - The currently active SQL connection when called.
+     *
+     * @return Promise.
+     */
     getDefaultTemplates: function(connection) {
         const _this = this;
         return _this.getTemplates(connection, _this.queries.defaultTemplates);
     },
 
+    /**
+     * Load user-defined theme templates from database.
+     *
+     * @param connection - The currently active SQL connection when called.
+     *
+     * @return Promise.
+     */
     getCustomTemplates: function(connection) {
         const _this = this;
         return _this.getTemplates(connection, _this.queries.customTemplates);
@@ -184,7 +208,7 @@ module.exports = {
         )
         .then(data => {
             data = [].concat.apply([], data);
-            var root = builder.create('squares');
+            var root = builder.create('theme');
 
             data.forEach(function(filename) {
                 fs.readFile(filename, 'utf-8', function(err, content) {
