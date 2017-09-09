@@ -3,7 +3,6 @@
 tasks/templates/config.json
 node_modules/*
 package-lock.json
-src/templates/*
 
 # Compiled source #
 ###################
