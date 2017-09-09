@@ -151,7 +151,6 @@ module.exports = {
 
                 return Promise.all(promises);
             })
-            .then(() => )
             .catch(e => msg.error(e));
     },
 
