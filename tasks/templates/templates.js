@@ -1,5 +1,5 @@
 /*! Original code by Matslom https://github.com/Matslom/mybb-theme-editor
-Modified by Eric Jackson http://digitalrelativity.com */
+Modified by Eric Jackson */
 
 'use strict';
 
